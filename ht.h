@@ -490,25 +490,25 @@ void HashTable<K, V, Prober, Hash, KEqual>::resize()
             // hash to find new index for item
             HASH_INDEX_T newIdx = hash_(key) % CAPACITIES[mIndex_];
 
-            HASH_INDEX_T loc = probe(key); // probe for new location
+            // HASH_INDEX_T loc = probe(key); // probe for new location
             if (loc == npos)
             {
                 throw std::logic_error("No free spots during rehashing.");
             }
 
-            /*Prober prober;
-             prober.init(newIdx, CAPACITIES[mIndex_], table_[i]->item.first);
+            Prober prober;
+            prober.init(newIdx, CAPACITIES[mIndex_], table_[i]->item.first);
 
-             int attempts = 0;
-             while (newTable[newIdx] != nullptr)
-             {
-                 newIdx = prober.next();
-                 attempts++;
-                 if (attempts >= CAPACITIES[mIndex_])
-                 { //  infinite loop
-                     throw std::logic_error("Too many probing attempts during resize.");
-                 }
-             }*/
+            int attempts = 0;
+            while (newTable[newIdx] != nullptr)
+            {
+                newIdx = prober.next();
+                attempts++;
+                if (attempts >= CAPACITIES[mIndex_])
+                { //  infinite loop
+                    throw std::logic_error("Too many probing attempts during resize.");
+                }
+            }
 
             newTable[newIdx] = table_[i]; // rehash item
             size_++;                      // increment for each rehashed item
