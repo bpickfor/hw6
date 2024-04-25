@@ -95,13 +95,13 @@ bool boggleHelper(const std::set<std::string> &dict, const std::set<std::string>
 				  std::string word, std::set<std::string> &result, unsigned int r, unsigned int c, int dr, int dc)
 {
 	// add your solution here!
-	unsigned int n = board.size();
 
 	// base case:
 	// if out of bounds
+	unsigned int n = board.size();
 	if (r >= n || c >= n || r < 0 || c < 0)
 	{
-		return false;
+		return false; // stop recursion
 	}
 
 	// build word
@@ -110,41 +110,29 @@ bool boggleHelper(const std::set<std::string> &dict, const std::set<std::string>
 
 	// check prefix
 	// if not a pref for longer word (cant find in prefixes), return false (stop recursion)
-	if (prefix.find(word) == prefix.end())
+	// is this the issue? returns false too early without adding that word to result?
+	// check if is a word in dictionary
+	bool isWord = dict.find(word) != dict.end();
+	bool isnotprefix = (prefix.find(word) == prefix.end());
+	if (isnotprefix)
 	{
+
+		if (isWord)
+		{
+			result.insert(word);
+			return true;
+		}
 		return false;
 	}
 
-	// check if is a word in dictionary
-	bool isWord = dict.find(word) != dict.end();
-
 	// recursure search in same direction
 	bool canExtend = boggleHelper(dict, prefix, board, word, result, r + dr, c + dc, dr, dc);
-
-	// if cant keep going further same direction, and alr is word
 	if (isWord && !canExtend)
 	{
-		bool longerExists = false;
-
-		// check starting point for longer word existing
-		// iterate thru all words in result set
-		for (std::set<std::string>::iterator it = result.begin(); it != result.end(); ++it)
-		{
-			std::string existingWord = *it; // get val, from iterator
-			// if longer exists
-			if (existingWord.size() > word.size() && existingWord.find(word) == 0)
-			{
-				longerExists = true;
-				break;
-			}
-		}
-
-		// if no longer word starting with curr word add to results
-		// if (!longerExists)
-		//{
 		result.insert(word);
-		//}
+		return true;
 	}
+	// if cant keep going further same direction, and alr is word
 
 	return isWord || canExtend; // continue if valid word found or rec can keep going in same direct
 }
