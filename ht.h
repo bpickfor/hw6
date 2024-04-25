@@ -485,10 +485,12 @@ void HashTable<K, V, Prober, Hash, KEqual>::resize()
         // if item at location is not empty and also not deleted
         if (table_[i] != nullptr && !table_[i]->deleted)
         {
+            // grab item key
+            const K &key = table_[i]->item.first;
             // hash to find new index for item
-            HASH_INDEX_T newIdx = hash_(table_[i]->item.first) % CAPACITIES[mIndex_];
+            HASH_INDEX_T newIdx = hash_(key) % CAPACITIES[mIndex_];
 
-            HASH_INDEX_T loc = probe(newIdx); // probe for new location
+            HASH_INDEX_T loc = probe(key); // probe for new location
             if (loc == npos)
             {
                 throw std::logic_error("No free spots during rehashing.");
