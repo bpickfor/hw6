@@ -283,6 +283,7 @@ private:
     HASH_INDEX_T mIndex_; // index to CAPACITIES
 
     // ADD MORE DATA MEMBERS HERE, AS NECESSARY
+    double resizeAlpha_;
 };
 
 // ----------------------------------------------------------------------------
@@ -299,10 +300,11 @@ const HASH_INDEX_T HashTable<K, V, Prober, Hash, KEqual>::CAPACITIES[] =
 
 // To be completed - attempted
 template <typename K, typename V, typename Prober, typename Hash, typename KEqual>
-HashTable<K, V, Prober, Hash, KEqual>::HashTable(() double resizeAlpha, const Prober &prober, const Hasher &hash, const KEqual &kequal)
+HashTable<K, V, Prober, Hash, KEqual>::HashTable(double resizeAlpha, const Prober &prober, const Hasher &hash, const KEqual &kequal)
     : hash_(hash), kequal_(kequal), prober_(prober)
 {
     // Initialize any other data members as necessary (in func decl)
+    resizeAlpha_ = resizeAlpha;                  // fixed this
     totalProbes = 0;                             // 0 probes done so far (fresh)
     mIndex_ = 0;                                 // start with smallest size
     table_.resize(CAPACITIES[mIndex_], nullptr); // make inital table
@@ -372,9 +374,9 @@ void HashTable<K, V, Prober, Hash, KEqual>::insert(const ItemType &p)
     {                                  // if empty
         table_[idx] = new HashItem(p); // insert new item
     }
-    esle
+    else
     {
-        table_[idx]->item.second = p.second // update value to be new val
+        table_[idx]->item.second = p.second; // update value to be new val
     }
 }
 
