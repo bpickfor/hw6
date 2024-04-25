@@ -475,6 +475,7 @@ void HashTable<K, V, Prober, Hash, KEqual>::resize()
     std::vector<HashItem *> newTable(CAPACITIES[mIndex_], nullptr);
 
     // rehash everything valid into new table
+    size_ = 0;
     for (HASH_INDEX_T i = 0; i < table_.size(); ++i)
     {
 
@@ -497,7 +498,8 @@ void HashTable<K, V, Prober, Hash, KEqual>::resize()
                 }
             }
 
-            newTable[newIdx] = table_[i];
+            newTable[newIdx] = table_[i]; // rehash item
+            size_++;                      // increment for each rehashed item
         }
         else if (table_[i] != nullptr && table_[i]->deleted)
         {
