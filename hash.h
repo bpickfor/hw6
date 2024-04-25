@@ -28,7 +28,16 @@ struct MyStringHash {
     HASH_INDEX_T letterDigitToNumber(char letter) const
     {
         // Add code here or delete this helper function if you do not want it
-
+        if (letter >= 'a' && letter <= 'z') {
+            return letter - 'a';
+        }
+        else if (letter >= 'A' && letter <= 'Z') {
+            return letter - 'A';
+        }
+        else if (letter >= '0' && letter <= '9') {
+            return 26 + (letter - '0');
+        }
+        return 0;
     }
 
     // Code to generate the random R values
