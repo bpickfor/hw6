@@ -305,7 +305,7 @@ HashTable<K, V, Prober, Hash, KEqual>::HashTable(double resizeAlpha, const Probe
 {
     // Initialize any other data members as necessary (in func decl)
     resizeAlpha_ = resizeAlpha;                  // fixed this
-    totalProbes = 0;                             // 0 probes done so far (fresh)
+    totalProbes_ = 0;                            // 0 probes done so far (fresh)
     mIndex_ = 0;                                 // start with smallest size
     table_.resize(CAPACITIES[mIndex_], nullptr); // make inital table
 }
