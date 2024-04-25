@@ -99,7 +99,7 @@ bool boggleHelper(const std::set<std::string> &dict, const std::set<std::string>
 
 	// base case:
 	// if out of bounds
-	if (r >= n || c >= n)
+	if (r >= n || c >= n || r < 0 || c < 0)
 	{
 		return false;
 	}
@@ -140,10 +140,10 @@ bool boggleHelper(const std::set<std::string> &dict, const std::set<std::string>
 		}
 
 		// if no longer word starting with curr word add to results
-		if (!longerExists)
-		{
-			result.insert(word);
-		}
+		// if (!longerExists)
+		//{
+		result.insert(word);
+		//}
 	}
 
 	return isWord || canExtend; // continue if valid word found or rec can keep going in same direct
