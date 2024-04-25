@@ -10,10 +10,18 @@ typedef std::size_t HASH_INDEX_T;
 
 struct MyStringHash
 {
-    HASH_INDEX_T rValues[5]{983132572, 1468777056, 552714139, 984953261, 261934300};
+    HASH_INDEX_T rValues[5];
     MyStringHash(bool debug = true)
     {
-        if (false == debug)
+        if (debug)
+        {
+            rValues[0] = 983132572;
+            rValues[1] = 1468777056;
+            rValues[2] = 552714139;
+            rValues[3] = 984953261;
+            rValues[4] = 261934300;
+        }
+        else if (false == debug)
         {
             generateRValues();
         }
