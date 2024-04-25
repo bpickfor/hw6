@@ -370,6 +370,7 @@ void HashTable<K, V, Prober, Hash, KEqual>::insert(const ItemType &p)
     else
     {
         table_[idx]->item.second = p.second; // update value to be new val
+        // size stays same
     }
 }
 
@@ -464,18 +465,19 @@ typename HashTable<K, V, Prober, Hash, KEqual>::HashItem *HashTable<K, V, Prober
 template <typename K, typename V, typename Prober, typename Hash, typename KEqual>
 void HashTable<K, V, Prober, Hash, KEqual>::resize()
 {
-    // move to next capac index
+    // move to next capac index (points to curr capac so incr to next prime num in capac list)
     mIndex_++;
+    // check if index is greater than # of availible prime nums in capac
     if (mIndex_ >= sizeof(CAPACITIES) / sizeof(CAPACITIES[0]))
     {
         throw std::logic_error("No more capacities available."); // No more sizes
     }
 
-    // make new table with the new size
+    // make new table with the new size of prime number, init to null vals
     std::vector<HashItem *> newTable(CAPACITIES[mIndex_], nullptr);
-
+    size_ = CAPACITIES[mIndex_];
     // rehash everything valid into new table
-    size_ = 0;
+    // size_ = 0;
     for (HASH_INDEX_T i = 0; i < table_.size(); ++i)
     {
 
@@ -499,7 +501,7 @@ void HashTable<K, V, Prober, Hash, KEqual>::resize()
             }
 
             newTable[newIdx] = table_[i]; // rehash item
-            size_++;                      // increment for each rehashed item
+            // size_++;                      // increment for each rehashed item
         }
         else if (table_[i] != nullptr && table_[i]->deleted)
         {
