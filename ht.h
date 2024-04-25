@@ -370,9 +370,14 @@ void HashTable<K, V, Prober, Hash, KEqual>::insert(const ItemType &p)
         throw std::logic_error("No free slots for insertion.");
     }
 
-    if (table_[idx] == nullptr)
+    if (table_[idx] == nullptr || table_[idx]->deleted)
     {                                  // if empty
         table_[idx] = new HashItem(p); // insert new item
+        // since filled spot mark as undeleted
+        if (table_[idx]->deleted)
+        {
+            table_[idx]->deleted = false;
+        }
     }
     else
     {
