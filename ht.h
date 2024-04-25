@@ -303,7 +303,7 @@ HashTable<K, V, Prober, Hash, KEqual>::HashTable(() double resizeAlpha, const Pr
     : hash_(hash), kequal_(kequal), prober_(prober)
 {
     // Initialize any other data members as necessary (in func decl)
-    totalProbes = 0; //0 probes done so far (fresh)
+    totalProbes = 0;                             // 0 probes done so far (fresh)
     mIndex_ = 0;                                 // start with smallest size
     table_.resize(CAPACITIES[mIndex_], nullptr); // make inital table
 }
@@ -312,10 +312,12 @@ HashTable<K, V, Prober, Hash, KEqual>::HashTable(() double resizeAlpha, const Pr
 template <typename K, typename V, typename Prober, typename Hash, typename KEqual>
 HashTable<K, V, Prober, Hash, KEqual>::~HashTable()
 {
-    for (HASH_INDEX_T i = 0; i < CAPACITIES[mIndex_]; i++) { //for all poss spaces in table
-        HashItem* item = table_[i];  
-        if (item != nullptr) { //if item exists
-            delete item; 
+    for (HASH_INDEX_T i = 0; i < CAPACITIES[mIndex_]; i++)
+    { // for all poss spaces in table
+        HashItem *item = table_[i];
+        if (item != nullptr)
+        { // if item exists
+            delete item;
         }
     }
 }
@@ -324,23 +326,27 @@ HashTable<K, V, Prober, Hash, KEqual>::~HashTable()
 template <typename K, typename V, typename Prober, typename Hash, typename KEqual>
 bool HashTable<K, V, Prober, Hash, KEqual>::empty() const
 {
-    for (HASH_INDEX_T i = 0; i < CAPACITIES[mIndex_]; i++) { //for all possible spaces in table
-        if (table_[i] != nullptr && !table_[i]->deleted) { //if val at loc not null and also not deleted
-            return false;  
+    for (HASH_INDEX_T i = 0; i < CAPACITIES[mIndex_]; i++)
+    { // for all possible spaces in table
+        if (table_[i] != nullptr && !table_[i]->deleted)
+        { // if val at loc not null and also not deleted
+            return false;
         }
     }
-    return true;  //every item null or deleted alr
+    return true; // every item null or deleted alr
 }
 
-// To be completed - attempted 
+// To be completed - attempted
 template <typename K, typename V, typename Prober, typename Hash, typename KEqual>
 size_t HashTable<K, V, Prober, Hash, KEqual>::size() const
 {
     size_t count = 0;
-    for (HASH_INDEX_T i = 0; i < table_.size(); ++i) { //iterate thru table curr size
-        HashItem* item = table_[i];
-        if (item != nullptr && !item->deleted) { //if item exists and not deleted
-            count++;  // Count non-deleted items
+    for (HASH_INDEX_T i = 0; i < table_.size(); ++i)
+    { // iterate thru table curr size
+        HashItem *item = table_[i];
+        if (item != nullptr && !item->deleted)
+        {            // if item exists and not deleted
+            count++; // Count non-deleted items
         }
     }
     return count;
@@ -350,21 +356,25 @@ size_t HashTable<K, V, Prober, Hash, KEqual>::size() const
 template <typename K, typename V, typename Prober, typename Hash, typename KEqual>
 void HashTable<K, V, Prober, Hash, KEqual>::insert(const ItemType &p)
 {
-    //check if need resize first
-    if (static_cast<double>(size()) / CAPACITIES[mIndex_] >= resizeAlpha_) {
+    // check if need resize first
+    if (static_cast<double>(size()) / CAPACITIES[mIndex_] >= resizeAlpha_)
+    {
         resize();
     }
 
-    HASH_INDEX_T idx = probe(p.first); //find insert point
-    if (idx ==npos) {
+    HASH_INDEX_T idx = probe(p.first); // find insert point
+    if (idx == npos)
+    {
         throw std::logic_error("No free slots for insertion.");
     }
 
-    if (table_[idx] == nullptr) { //if empty
-        table_[idx] = new HashItem(p); //insert new item
+    if (table_[idx] == nullptr)
+    {                                  // if empty
+        table_[idx] = new HashItem(p); // insert new item
     }
-    esle {
-        table_[idx]->item.second = p.second //update value to be new val
+    esle
+    {
+        table_[idx]->item.second = p.second // update value to be new val
     }
 }
 
@@ -372,10 +382,11 @@ void HashTable<K, V, Prober, Hash, KEqual>::insert(const ItemType &p)
 template <typename K, typename V, typename Prober, typename Hash, typename KEqual>
 void HashTable<K, V, Prober, Hash, KEqual>::remove(const KeyType &key)
 {
-    HASH_INDEX_T idx = probe(key); //get key
-    //if ID exists, and value at id isnt empty, and it wasnt alr marked as deleted
-    if (idx != npos && table_[idx] != nullptr && !table_[idx]->deleted) {
-        table_[idx]->deleted = true; //set as deleted
+    HASH_INDEX_T idx = probe(key); // get key
+    // if ID exists, and value at id isnt empty, and it wasnt alr marked as deleted
+    if (idx != npos && table_[idx] != nullptr && !table_[idx]->deleted)
+    {
+        table_[idx]->deleted = true; // set as deleted
     }
 }
 
@@ -453,11 +464,41 @@ typename HashTable<K, V, Prober, Hash, KEqual>::HashItem *HashTable<K, V, Prober
     return table_[h];
 }
 
-// To be completed
+// To be completed - attempted
 template <typename K, typename V, typename Prober, typename Hash, typename KEqual>
 void HashTable<K, V, Prober, Hash, KEqual>::resize()
 {
-    
+    // move to next capac index
+    mIndex_++;
+    if (mIndex_ >= sizeof(CAPACITIES) / sizeof(CAPACITIES[0]))
+    {
+        throw std::logic_error("No more capacities available."); // No more sizes
+    }
+
+    // make new table with the new size
+    std::vector<HashItem *> newTable(CAPACITIES[mIndex_], nullptr);
+
+    // rehash everything valid into new table
+    for (HASH_INDEX_T i = 0; i < CAPACITIES[mIndex_ - 1]; i++)
+    {
+        // if item at location is not empty and also not deleted
+        if (table_[i] != nullptr && !table_[i]->deleted)
+        {
+            // hash to find new index for item
+            HASH_INDEX_T newIdx = hash_(table_[i]->item.first) % CAPACITIES[mIndex_];
+            Prober prober;
+            prober.init(newIdx, CAPACITIES[mIndex_], table_[i]->item.first);
+
+            while (newTable[newIdx] != nullptr)
+            {
+                newIdx = prober.next(); // get next index w/ prber
+            }
+
+            newTable[newIdx] = table_[i]; // put item into table
+        }
+        // swap old table with new table
+        table_.swap(newTable);
+    }
 }
 
 // Almost complete - attempted
@@ -477,8 +518,8 @@ HASH_INDEX_T HashTable<K, V, Prober, Hash, KEqual>::probe(const KeyType &key) co
         }
         // fill in the condition for this else if statement which should
         // return 'loc' if the given key exists at this location
-        
-        //if not empty space at loc, and key we want exists at that loc and val hasnt been deleted
+
+        // if not empty space at loc, and key we want exists at that loc and val hasnt been deleted
         else if (table_[loc] != nullptr && kequal_(table_[loc]->item.first, key) && !table_[loc]->deleted)
         {
             return loc;
