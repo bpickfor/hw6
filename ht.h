@@ -500,7 +500,7 @@ void HashTable<K, V, Prober, Hash, KEqual>::resize()
                 int attempts = 0;
                 while (newTable[newIdx] != nullptr)
                 {
-                    newIdx = tempProber.next();
+                    newIdx = prober.next();
                     attempts++;
                     if (attempts >= CAPACITIES[mIndex_])
                     { //  infinite loop
