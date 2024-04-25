@@ -475,9 +475,9 @@ void HashTable<K, V, Prober, Hash, KEqual>::resize()
 
     // make new table with the new size of prime number, init to null vals
     std::vector<HashItem *> newTable(CAPACITIES[mIndex_], nullptr);
-    size_ = CAPACITIES[mIndex_];
+    //size_ = CAPACITIES[mIndex_]; <-- wrong
     // rehash everything valid into new table
-    // size_ = 0;
+     //size_ = 0;
     for (HASH_INDEX_T i = 0; i < table_.size(); ++i)
     {
 
@@ -501,7 +501,7 @@ void HashTable<K, V, Prober, Hash, KEqual>::resize()
             }
 
             newTable[newIdx] = table_[i]; // rehash item
-            // size_++;                      // increment for each rehashed item
+            size_++;                      // increment for each rehashed item
         }
         else if (table_[i] != nullptr && table_[i]->deleted)
         {
