@@ -42,8 +42,8 @@ struct LinearProber : public Prober<KeyType>
             return this->npos; // probe fail if as large as m, bc did all attempts w/o finding open slot
             // so failure to fix collis, stop probing
         }
-        HASH_INDEX_T loc = (this->start_ + this->numProbes_) % this->m_;
-        this->numProbes_++; // incr prob count
+        HASH_INDEX_T loc = (this->start_ + this->numProbes_) % this->m_; // incr by 1
+        this->numProbes_++;                                              // incr prob count
         return loc;
     }
 };
@@ -113,9 +113,9 @@ public:
         }
         // calc next index for probing :
         // start + num probs * double step % table size
-        HASH_INDEX_T loc = (this->start_ + this->numProbes_ * dhstep_) % this->m_;
-        this->numProbes_++; // incr num probs
-        return loc;         // return new location
+        HASH_INDEX_T loc = (this->start_ + this->numProbes_ * dhstep_) % this->m_; // double hash probing
+        this->numProbes_++;                                                        // incr num probs
+        return loc;                                                                // return new location
     }
 };
 
@@ -537,7 +537,8 @@ HASH_INDEX_T HashTable<K, V, Prober, Hash, KEqual>::probe(const KeyType &key) co
         // fill in the condition for this else if statement which should
         // return 'loc' if the given key exists at this location
 
-        // if not empty space at loc, and key we want exists at that loc and val hasnt been deleted
+        // should i use total probes as a condition in this else if?
+        //  if not empty space at loc, and key we want exists at that loc and val hasnt been deleted
         else if (table_[loc] != nullptr && kequal_(table_[loc]->item.first, key) && !table_[loc]->deleted)
         {
             return loc;
