@@ -95,11 +95,11 @@ bool boggleHelper(const std::set<std::string> &dict, const std::set<std::string>
 				  std::string word, std::set<std::string> &result, unsigned int r, unsigned int c, int dr, int dc)
 {
 	// add your solution here!
-	//GO GET HELP IN MORNING FAILING ALL TESTS
+	unsigned int n = board.size();
 
 	// base case:
 	// if out of bounds
-	if (r >= board.size() || c >= board[0].size())
+	if (r >= n || c >= n)
 	{
 		return false;
 	}
@@ -109,34 +109,42 @@ bool boggleHelper(const std::set<std::string> &dict, const std::set<std::string>
 	word += board[r][c];
 
 	// check prefix
-	// if not a pref for longer word (cant find in prefixes), return false
+	// if not a pref for longer word (cant find in prefixes), return false (stop recursion)
 	if (prefix.find(word) == prefix.end())
 	{
 		return false;
 	}
 
-	bool found = false;
-	// if complete word
-	if (dict.find(word) != dict.end())
+	// check if is a word in dictionary
+	bool isWord = dict.find(word) != dict.end();
+
+	// recursure search in same direction
+	bool canExtend = boggleHelper(dict, prefix, board, word, result, r + dr, c + dc, dr, dc);
+
+	// if cant keep going further same direction, and alr is word
+	if (isWord && !canExtend)
 	{
-		// if result empty, or word is longer than curr result word
-		if (result.empty() || word.size() > (*result.begin()).size())
+		bool longerExists = false;
+
+		// check starting point for longer word existing
+		// iterate thru all words in result set
+		for (std::set<std::string>::iterator it = result.begin(); it != result.end(); ++it)
 		{
-			// remove result
-			result.clear();
-			// put in new word as result
+			std::string existingWord = *it; // get val, from iterator
+			// if longer exists
+			if (existingWord.size() > word.size() && existingWord.find(word) == 0)
+			{
+				longerExists = true;
+				break;
+			}
+		}
+
+		// if no longer word starting with curr word add to results
+		if (!longerExists)
+		{
 			result.insert(word);
 		}
-		found = true; // mark result as found
 	}
 
-	// recurse!!!!!
-	// make rec call but update row and col with direction
-	if (boggleHelper(dict, prefix, board, word, result, r + dr, c + dc, dr, dc))
-	{
-		// if rec call find word ^ it enters if statement and keeps flag
-		found = true;
-	}
-
-	return found;
+	return isWord || canExtend; // continue if valid word found or rec can keep going in same direct
 }
