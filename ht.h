@@ -486,25 +486,32 @@ void HashTable<K, V, Prober, Hash, KEqual>::resize()
     std::vector<HashItem *> newTable(CAPACITIES[mIndex_], nullptr);
 
     // rehash everything valid into new table
-    for (HASH_INDEX_T i = 0; i < CAPACITIES[mIndex_ - 1]; i++)
+    for (HASH_INDEX_T i = 0; i < table_.size(); ++i)
     {
-        // if item at location is not empty and also not deleted
-        if (table_[i] != nullptr && !table_[i]->deleted)
         {
-            // hash to find new index for item
-            HASH_INDEX_T newIdx = hash_(table_[i]->item.first) % CAPACITIES[mIndex_];
-            Prober prober;
-            prober.init(newIdx, CAPACITIES[mIndex_], table_[i]->item.first);
-
-            while (newTable[newIdx] != nullptr)
+            // if item at location is not empty and also not deleted
+            if (table_[i] != nullptr && !table_[i]->deleted)
             {
-                newIdx = prober.next(); // get next index w/ prber
-            }
+                // hash to find new index for item
+                HASH_INDEX_T newIdx = hash_(table_[i]->item.first) % CAPACITIES[mIndex_];
+                Prober prober;
+                prober.init(newIdx, CAPACITIES[mIndex_], table_[i]->item.first);
 
-            newTable[newIdx] = table_[i]; // put item into table
+                int attempts = 0;
+                while (newTable[newIdx] != nullptr)
+                {
+                    newIdx = tempProber.next();
+                    attempts++;
+                    if (attempts >= CAPACITIES[mIndex_])
+                    { //  infinite loop
+                        throw std::logic_error("Too many probing attempts during resize.");
+                    }
+                }
+
+                newTable[newIdx] = table_[i];
+            }
         }
-        // swap old table with new table
-        table_.swap(newTable);
+        table_.swap(newTable); // swap old table with new
     }
 }
 
