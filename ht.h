@@ -284,6 +284,7 @@ private:
 
     // ADD MORE DATA MEMBERS HERE, AS NECESSARY
     double resizeAlpha_;
+    size_t deletedSize_;
     size_t size_; // stores size of hash table to avoid looping thru everytime
 };
 
@@ -306,6 +307,7 @@ HashTable<K, V, Prober, Hash, KEqual>::HashTable(double resizeAlpha, const Probe
     : hash_(hash), kequal_(kequal), prober_(prober)
 {
     // Initialize any other data members as necessary (in func decl)
+    deletedSize_ = 0;
     size_ = 0;
     resizeAlpha_ = resizeAlpha;                  // fixed this
     totalProbes_ = 0;                            // 0 probes done so far (fresh)
@@ -346,7 +348,7 @@ template <typename K, typename V, typename Prober, typename Hash, typename KEqua
 void HashTable<K, V, Prober, Hash, KEqual>::insert(const ItemType &p)
 {
     // check if need resize first
-    if (static_cast<double>(size()) / CAPACITIES[mIndex_] >= resizeAlpha_)
+    if (static_cast<double>(size() + deletedSize_) / CAPACITIES[mIndex_] >= resizeAlpha_)
     {
         resize();
     }
@@ -384,6 +386,7 @@ void HashTable<K, V, Prober, Hash, KEqual>::remove(const KeyType &key)
     {
         table_[idx]->deleted = true; // set as deleted
         size_--;                     // decrement size
+        deletedSize_++;
     }
 }
 
@@ -479,9 +482,10 @@ void HashTable<K, V, Prober, Hash, KEqual>::resize()
     //  rehash everything valid into new table
     // size_ = 0;
     size_t newSize = 0;
+    deletedSize_ = 0;
     table_.swap(newTable); // swap old table with new
 
-    for (HASH_INDEX_T i = 0; i < table_.size(); ++i)
+    for (HASH_INDEX_T i = 0; i < CAPACITIES[mIndex_ - 1]; ++i)
     {
 
         // if item at location is not empty and also not deleted
@@ -545,7 +549,7 @@ HASH_INDEX_T HashTable<K, V, Prober, Hash, KEqual>::probe(const KeyType &key) co
 
         // should i use total probes as a condition in this else if?
         //  if not empty space at loc, and key we want exists at that loc and val hasnt been deleted
-        else if (/*table_[loc] != nullptr &&*/ kequal_(table_[loc]->item.first, key) && !table_[loc]->deleted)
+        else if (table_[loc] != nullptr && kequal_(table_[loc]->item.first, key) && !table_[loc]->deleted)
         {
             return loc;
         }
