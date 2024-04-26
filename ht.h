@@ -483,11 +483,12 @@ void HashTable<K, V, Prober, Hash, KEqual>::resize()
     {
 
         // if item at location is not empty and also not deleted
+        // MAYBE MOVE OVER DELETED STUFF ALSO? SEEMS SILLY THO
         if (table_[i] != nullptr && !table_[i]->deleted)
         {
             // grab item key
             const K &key = table_[i]->item.first;
-            // hash to find new index for item
+            // hash key to find new index for item
             HASH_INDEX_T newIdx = hash_(key) % CAPACITIES[mIndex_];
 
             /* HASH_INDEX_T loc = probe(key); // probe for new location
@@ -511,11 +512,11 @@ void HashTable<K, V, Prober, Hash, KEqual>::resize()
             }
 
             newTable[newIdx] = table_[i]; // rehash item
-            size_++;                      // increment for each rehashed item
+            size_++;                      // increment for each rehashed item u put in new table
         }
         else if (table_[i] != nullptr && table_[i]->deleted)
         {
-            delete table_[i]; // delete items marked as deleted
+            delete table_[i]; // delete items marked as deleted, and all not empty items
         }
     }
 
@@ -542,7 +543,7 @@ HASH_INDEX_T HashTable<K, V, Prober, Hash, KEqual>::probe(const KeyType &key) co
 
         // should i use total probes as a condition in this else if?
         //  if not empty space at loc, and key we want exists at that loc and val hasnt been deleted
-        else if (table_[loc] != nullptr && kequal_(table_[loc]->item.first, key) && !table_[loc]->deleted)
+        else if (/*table_[loc] != nullptr &&*/ kequal_(table_[loc]->item.first, key) && !table_[loc]->deleted)
         {
             return loc;
         }
