@@ -488,31 +488,32 @@ void HashTable<K, V, Prober, Hash, KEqual>::resize()
         {
             // grab item key
             const K &key = table_[i]->item.first;
-            // hash key to find new index for item
-            HASH_INDEX_T newIdx = hash_(key) % CAPACITIES[mIndex_];
+            // // hash key to find new index for item
+            // HASH_INDEX_T newIdx = hash_(key) % CAPACITIES[mIndex_];
 
-            /* HASH_INDEX_T loc = probe(key); // probe for new location
-            if (loc == npos)
-            {
-                throw std::logic_error("No free spots during rehashing.");
-            }*/
+            // /* HASH_INDEX_T loc = probe(key); // probe for new location
+            // if (loc == npos)
+            // {
+            //     throw std::logic_error("No free spots during rehashing.");
+            // }*/
 
-            Prober prober;
-            prober.init(newIdx, CAPACITIES[mIndex_], table_[i]->item.first);
+            // Prober prober;
+            // prober.init(newIdx, CAPACITIES[mIndex_], table_[i]->item.first);
 
-            int attempts = 0;
-            while (newTable[newIdx] != nullptr)
-            {
-                newIdx = prober.next();
-                attempts++;
-                if (attempts >= CAPACITIES[mIndex_])
-                { //  infinite loop
-                    throw std::logic_error("Too many probing attempts during resize.");
-                }
-            }
-
-            newTable[newIdx] = table_[i]; // rehash item
-            size_++;                      // increment for each rehashed item u put in new table
+            // int attempts = 0;
+            // while (newTable[newIdx] != nullptr)
+            // {
+            //     newIdx = prober.next();
+            //     attempts++;
+            //     if (attempts >= CAPACITIES[mIndex_])
+            //     { //  infinite loop
+            //         throw std::logic_error("Too many probing attempts during resize.");
+            //     }
+            // }
+            HASH_INDEX_T loc = this->probe(key); // probe for new location
+            // newTable[newIdx] = table_[i]; // rehash item
+            newTable[loc] = table_[i];
+            size_++; // increment for each rehashed item u put in new table
         }
         else if (table_[i] != nullptr && table_[i]->deleted)
         {
