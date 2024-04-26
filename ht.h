@@ -477,17 +477,19 @@ void HashTable<K, V, Prober, Hash, KEqual>::resize()
     std::vector<HashItem *> newTable(CAPACITIES[mIndex_], nullptr);
     // size_ = CAPACITIES[mIndex_]; <-- wrong
     //  rehash everything valid into new table
-    size_ = 0;
+    // size_ = 0;
+    size_t newSize = 0;
+    table_.swap(newTable); // swap old table with new
 
     for (HASH_INDEX_T i = 0; i < table_.size(); ++i)
     {
 
         // if item at location is not empty and also not deleted
         // MAYBE MOVE OVER DELETED STUFF ALSO? SEEMS SILLY THO
-        if (table_[i] != nullptr && !table_[i]->deleted)
+        if (newTable[i] != nullptr && !newTable[i]->deleted)
         {
             // grab item key
-            const K &key = table_[i]->item.first;
+            const K &key = newTable[i]->item.first;
             // // hash key to find new index for item
             // HASH_INDEX_T newIdx = hash_(key) % CAPACITIES[mIndex_];
 
@@ -512,16 +514,15 @@ void HashTable<K, V, Prober, Hash, KEqual>::resize()
             // }
             HASH_INDEX_T loc = this->probe(key); // probe for new location
             // newTable[newIdx] = table_[i]; // rehash item
-            newTable[loc] = table_[i];
-            size_++; // increment for each rehashed item u put in new table
+            table_[loc] = newTable[i];
+            newSize++; // increment for each rehashed item u put in new table
         }
-        else if (table_[i] != nullptr && table_[i]->deleted)
+        else if (newTable[i] != nullptr && newTable[i]->deleted)
         {
-            delete table_[i]; // delete items marked as deleted, and all not empty items
+            delete newTable[i]; // delete items marked as deleted, and all not empty items
         }
     }
-
-    table_.swap(newTable); // swap old table with new
+    size_ = newSize;
 }
 
 // Almost complete - attempted
